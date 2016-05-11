@@ -1,0 +1,12 @@
+1,Pulp Fiction,Thriller,1994,9.4,7/5/2016
+2,El Padrino,Thriller,1972,9.6,8/5/2016
+3,La vida es bella,Drama,1997,9.2,7/5/2016
+4,El club de la lucha,Accion,1999,8.8,7/5/2016
+5,La lista de Schindler,Drama,1993,9.0,7/5/2016
+6,Amelie,Comedia,2001,8.5,7/5/2016
+7,El señor de los anillos: El retorno del rey,Accion,2003,8.4,7/5/2016
+8,El señor de los anillos: Las dos torres,Accion,2002,8.2,7/5/2016 
+9,El señor de los anillos: La comunidad del anillo,Accion,2001,7.9,7/5/2016
+10,Seven,Thriller,1995,9.6,7/5/2016
+11,El caballero oscuro,Accion,2008,8.0,7/5/2016
+
