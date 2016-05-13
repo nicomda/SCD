@@ -33,7 +33,10 @@ public class ApiImplemented extends UnicastRemoteObject implements Api {
     public ApiImplemented() throws RemoteException {
         super();
         try {
+            DB=new LinkedBlockingDeque<>();
+            rented=new LinkedBlockingDeque<>();
             loadDBFromFile(DB);
+            System.out.println("--------------------\nLa base de datos ha sido cargada correctamente.\n--------------------");
         } catch (FileNotFoundException ex) {
             System.out.println("Error al leer el fichero.");
         }
@@ -48,9 +51,9 @@ public class ApiImplemented extends UnicastRemoteObject implements Api {
     @Override
     public boolean addFilm(Pelicula peli) throws RemoteException {
         DB.add(peli);
+        System.out.println("Alquilada "+peli.getTitle());
         boolean ret;
-        return ret=DB.contains(peli);
-        
+        return ret=true;  
     }
     /**
      *
@@ -62,15 +65,11 @@ public class ApiImplemented extends UnicastRemoteObject implements Api {
      */
     @Override
     public boolean rent(Pelicula peli, int userID) throws RemoteException {
-        if(DB.contains(peli)){
-            DB.remove(peli);
-            Pelicula aux=new Pelicula(peli);
+            Pelicula aux=peli;
             aux.setRented(true);
             aux.setRentUserId(userID);
-            DB.add(aux);
+            rented.add(aux);
             return true;
-        }
-        else return false;
     }
     /**
      *
@@ -79,7 +78,6 @@ public class ApiImplemented extends UnicastRemoteObject implements Api {
      * @throws java.rmi.RemoteException
      * @throws java.io.FileNotFoundException
      */
-    @Override
     public void loadDBFromFile(LinkedBlockingDeque<Pelicula> DB) throws RemoteException, FileNotFoundException {
         String lineBuffer;
         String name, gender, date;
@@ -121,7 +119,12 @@ public class ApiImplemented extends UnicastRemoteObject implements Api {
             case "Rate":
                 Collections.sort(list, new Comparator<Pelicula>(){
                 @Override public int compare(Pelicula p1, Pelicula p2){
-                    return (int)(p1.getRating()-p2.getRating());}
+                    float aux;
+                    aux=p1.getRating()-p2.getRating();
+                    if(aux<0) aux=-1;
+                    if(aux>0) aux=1;
+                    return (int) aux;
+                                                            }
                 });
                 break;
             case "Gender":
@@ -149,29 +152,22 @@ public class ApiImplemented extends UnicastRemoteObject implements Api {
 
     @Override
     public boolean watchFilm(Pelicula peli,int userID) throws RemoteException {
-        Pelicula aux = peli;
-        Iterator<Pelicula> itpeli=DB.iterator();
-        while(itpeli.equals(peli)){
-            aux=itpeli.next();
+        Pelicula aux;
+        aux=rented.pollFirst();
+        if(aux!=null){
+            return true;
         }
-            if(aux.isRented() && aux.getRentUserId()==userID){
-                DB.remove(peli);
-                aux.setRented(false); 
-                aux.setRentUserId(0);
-                DB.add(aux);
-                return true;
-            }
-            else return false;
+        else return false;
+        
 
     }
 
     @Override
     public ArrayList<Pelicula> listRent(int userId) throws RemoteException {
-        Iterator<Pelicula> itpeli=DB.iterator();
+        Iterator<Pelicula> itpeli=rented.iterator();
         ArrayList<Pelicula> rentedFilms=new ArrayList<>();
-        Pelicula aux;
         while(itpeli.hasNext()){
-            aux=new Pelicula(itpeli.next());
+            Pelicula aux=itpeli.next();
             if(aux.getRentUserId()==userId){
                 rentedFilms.add(aux);
             }
